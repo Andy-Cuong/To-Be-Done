@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">To Be Done</string>
+    <string name="created">Created: %1$s</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="collapse_time_details">Collapse time details</string>
+    <string name="expand_time_details">Expand time details</string>
+    <string name="search_notes">Search notes...</string>
+    <string name="clear">Clear</string>
+    <string name="add_new_note">Add new note</string>
+    <string name="hide_time_detail">Hide time detail</string>
+    <string name="show_time_detail">Show time detail</string>
+    <string name="open_sort_option">Open sort option</string>
+    <string name="sort_by_creation_time">Sort by Creation time</string>
+    <string name="sort_by_update_time">Sort by Update time</string>
+    <string name="sort_by_priority">Sort by Priority</string>
+    <string name="new_note">New Note</string>
+    <string name="back">Back</string>
+    <string name="enter_title">Enter title...</string>
+    <string name="enter_content">Enter your note...</string>
+    <string name="default_priority">Default</string>
+    <string name="critical_priority">Critical</string>
+    <string name="need_attention_priority">Need attention</string>
+    <string name="optional_priority">Optional</string>
+    <string name="trivial_priority">Trivial</string>
+    <string name="select_priority">Select priority</string>
+    <string name="priority">Priority</string>
+    <string name="done">Done</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="empty_screen">How empty. Try another search or add a note by using the button below</string>
+    <string name="filter_applied">Filter applied. Tap to change filter</string>
+    <string name="no_filter_applied">No filter applied. Tap to change filter</string>
+    <string name="applied">Applied</string>
+    <string name="not_done">Not done</string>
+    <string name="reset_filter">Reset filter</string>
+</resources>
