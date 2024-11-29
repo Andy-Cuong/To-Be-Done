@@ -43,7 +43,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -462,11 +461,11 @@ fun TextNoteCard(
     isExpanded: Boolean = false
 ) {
     val backGroundColor = when (textNote.priority) {
-        1 -> Color.Red
-        2 -> Color(0xFFFF9900) // Orange
-        3 -> Color.Yellow
-        4 -> Color.Cyan
-        else -> Color.Green
+        1 -> Priority.CRITICAL.color
+        2 -> Priority.NEED_ATTENTION.color
+        3 -> Priority.DEFAULT.color
+        4 -> Priority.OPTIONAL.color
+        else -> Priority.TRIVIAL.color
     }
 
     Card(

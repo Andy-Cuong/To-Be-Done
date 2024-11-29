@@ -1,6 +1,7 @@
 package com.example.tobedone.model
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -20,10 +21,13 @@ data class TextNote(
     val priority: Int
 )
 
-enum class Priority(@StringRes val priorityText: Int) {
-    CRITICAL(priorityText = R.string.critical_priority),
-    NEED_ATTENTION(priorityText = R.string.need_attention_priority),
-    DEFAULT(priorityText = R.string.default_priority),
-    OPTIONAL(priorityText = R.string.optional_priority),
-    TRIVIAL(priorityText = R.string.trivial_priority)
+enum class Priority(
+    @StringRes val priorityText: Int,
+    val color: Color
+) {
+    CRITICAL(priorityText = R.string.critical_priority, color = Color.Red),
+    NEED_ATTENTION(priorityText = R.string.need_attention_priority, color = Color(0xFFFF9900)),
+    DEFAULT(priorityText = R.string.default_priority, color = Color.Yellow),
+    OPTIONAL(priorityText = R.string.optional_priority, color = Color.Cyan),
+    TRIVIAL(priorityText = R.string.trivial_priority, color = Color.Green)
 }
