@@ -2,18 +2,23 @@ package com.example.tobedone.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +42,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,6 +52,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,6 +62,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,6 +77,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -358,16 +368,176 @@ fun TextNoteList(
 //                onCheckBoxClicked = onCheckBoxClicked,
 //                isExpanded = isExpanded
 //            )
-            SwipeToDeleteContainer(
+
+//            SwipeToDeleteContainer(
+//                item = textNote,
+//                onDelete = onDeleteTextNote
+//            ) {
+//                TextNoteCard(
+//                    textNote = textNote,
+//                    onTextNoteClicked = onTextNoteClicked,
+//                    onCheckBoxClicked = onCheckBoxClicked,
+//                    isExpanded = isExpanded
+//                )
+//            }
+
+            var isContextMenuRevealed by remember { mutableStateOf(false) }
+            SwipeableItem(
                 item = textNote,
-                onDelete = onDeleteTextNote
+                onDelete = onDeleteTextNote,
+                isRevealed = isContextMenuRevealed,
+                onExpanded = { isContextMenuRevealed = true },
+                onCollapsed = { isContextMenuRevealed = false }
             ) {
                 TextNoteCard(
                     textNote = textNote,
                     onTextNoteClicked = onTextNoteClicked,
-                    onCheckBoxClicked = onCheckBoxClicked,
+                    onCheckBoxClicked = {
+                        if (!textNote.isDone) {
+                            isContextMenuRevealed = true
+                        }
+                        onCheckBoxClicked(textNote)
+                    },
                     isExpanded = isExpanded
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun <T> SwipeableItem(
+    item: T,
+    onDelete: (T) -> Unit,
+    isRevealed: Boolean,
+    modifier: Modifier = Modifier,
+    deleteAnimationDuration: Int = 500,
+    onExpanded: () -> Unit = {},
+    onCollapsed: () -> Unit = {},
+    content: @Composable (T) -> Unit
+) {
+    var contextMenuWidth by remember { mutableFloatStateOf(0f) }
+    var isDeleted by remember { mutableStateOf(false) }
+    val offset = remember { Animatable(initialValue = 0f) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Used to programmatically control the swipe state if needed
+    LaunchedEffect(isRevealed, contextMenuWidth, isDeleted) {
+        if (isRevealed) {
+            offset.animateTo(-contextMenuWidth)
+            onExpanded()
+        } else {
+            offset.animateTo(0f)
+            onCollapsed()
+        }
+
+        if (isDeleted) {
+            delay(deleteAnimationDuration.toLong())
+            onDelete(item)
+        }
+    }
+
+    AnimatedVisibility( // Animate the removal action
+        visible = !isDeleted,
+        exit = shrinkVertically(
+            animationSpec = tween(durationMillis = deleteAnimationDuration),
+            shrinkTowards = Alignment.Top
+        ) + fadeOut()
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
+            Row( // The row for the contextMenu
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .onSizeChanged {
+                        // Measure the width of the context menu on drawn
+                        contextMenuWidth = it.width.toFloat()
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            offset.animateTo(0f)
+                        }
+                        onCollapsed()
+                    },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .background(Color.LightGray)
+                        .padding(dimensionResource(R.dimen.padding_medium))
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = null,
+                        tint = Color.Black
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            offset.animateTo(0f)
+                        }
+                        isDeleted = true
+                        onCollapsed()
+                    },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .background(Color.Red)
+                        .padding(dimensionResource(R.dimen.padding_medium))
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+
+            Surface( // The content overlapping the context menu
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset {
+                        IntOffset(
+                            x = offset.value.roundToInt(),
+                            y = 0
+                        )
+                    } // Use negative since we want to drag from end to start
+                    .pointerInput(key1 = contextMenuWidth) {
+                        detectHorizontalDragGestures(
+                            onHorizontalDrag = { _, dragAmount ->
+                                coroutineScope.launch {
+                                    val newOffset = (offset.value + dragAmount)
+                                        .coerceIn( // Used to force swipe from end to start only
+                                            minimumValue = -contextMenuWidth,
+                                            maximumValue = 0f
+                                        )
+                                    offset.snapTo(newOffset)
+                                }
+                            },
+                            onDragEnd = {
+                                when {
+                                    offset.value <= contextMenuWidth / -2f -> {
+                                        coroutineScope.launch {
+                                            offset.animateTo(-contextMenuWidth)
+                                            onExpanded()
+                                        }
+                                    }
+                                    else -> {
+                                        coroutineScope.launch {
+                                            offset.animateTo(0f)
+                                            onCollapsed()
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+            ) {
+                content(item)
             }
         }
     }
@@ -381,19 +551,19 @@ fun <T> SwipeToDeleteContainer(
     modifier: Modifier = Modifier,
     content: @Composable (T) -> Unit
 ) {
-    var isRemoved by remember { mutableStateOf(false) }
+    var isDeleted by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val dismissState = rememberSwipeToDismissBoxState()
 
-    LaunchedEffect(key1 = isRemoved) {
-        if (isRemoved) {
+    LaunchedEffect(key1 = isDeleted) {
+        if (isDeleted) {
             delay(animationDuration.toLong())
             onDelete(item)
         }
     }
 
     AnimatedVisibility( // Animate the removal action
-        visible = !isRemoved,
+        visible = !isDeleted,
         exit = shrinkVertically(
             animationSpec = tween(durationMillis = animationDuration),
             shrinkTowards = Alignment.Top
@@ -428,7 +598,7 @@ fun <T> SwipeToDeleteContainer(
                         )
                     }
                     IconButton(
-                        onClick = { isRemoved = true },
+                        onClick = { isDeleted = true },
                         modifier = Modifier
                             .fillMaxHeight()
                             .background(Color.Red)
@@ -576,7 +746,7 @@ private fun TextNoteScreenPrev() {
             id = 2,
             title = "Note 2",
             content = "You need to do this, that, these, those, and many more things, go do them now",
-            isDone = false,
+            isDone = true,
             updateEpochSecond = 1730087509,
             creationEpochSecond = 1612117809,
             priority = 5
