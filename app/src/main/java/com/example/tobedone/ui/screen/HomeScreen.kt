@@ -418,6 +418,8 @@ fun <T> SwipeableItem(
 ) {
     var contextMenuWidth by remember { mutableFloatStateOf(0f) }
     var isDeleted by remember { mutableStateOf(false) }
+    val currentOnExpanded by rememberUpdatedState(onExpanded)
+    val currentOnCollapsed by rememberUpdatedState(onCollapsed)
     val offset = remember { Animatable(initialValue = 0f) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -425,10 +427,10 @@ fun <T> SwipeableItem(
     LaunchedEffect(isRevealed, contextMenuWidth, isDeleted) {
         if (isRevealed) {
             offset.animateTo(-contextMenuWidth)
-            onExpanded()
+            currentOnExpanded()
         } else {
             offset.animateTo(0f)
-            onCollapsed()
+            currentOnCollapsed()
         }
 
         if (isDeleted) {
