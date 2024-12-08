@@ -3,6 +3,7 @@ package com.example.tobedone.ui.screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -56,7 +57,8 @@ fun EditNoteScreen(
                     onClick = {
                         editNoteScreenViewModel.onDone()
                         onNavigateBack()
-                    }
+                    },
+                    modifier = Modifier.imePadding()
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_check),

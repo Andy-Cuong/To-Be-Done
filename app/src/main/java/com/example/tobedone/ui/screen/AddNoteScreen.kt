@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
@@ -79,7 +80,8 @@ fun AddNoteScreen(
                     onClick = {
                         addNoteScreenViewModel.onDone()
                         onNavigateBack()
-                    }
+                    },
+                    modifier = Modifier.imePadding()
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_check),
