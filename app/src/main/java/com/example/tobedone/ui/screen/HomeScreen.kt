@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -113,13 +114,15 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = onAddButtonClicked,
                 modifier = Modifier
-                    .size(80.dp)
                     .padding(dimensionResource(R.dimen.padding_medium))
+                    .imePadding()
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add_circle),
                     contentDescription = stringResource(R.string.add_new_note),
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier
+                        .size(60.dp)
+                        .padding(dimensionResource(R.dimen.padding_medium))
                 )
             }
         },
