@@ -19,8 +19,8 @@ import com.example.tobedone.ui.screen.HomeScreen
 
 @Composable
 fun ToBeDoneNavHost(
-    navHostController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navHostController,
