@@ -49,20 +49,16 @@ class HomeScreenViewModel(
         // a new value (e.g search value change, or sortedBy change), the flatMapLatest block will be
         // triggered, which return a Flow of data (List<TextNote> in this case) from the repo
         _homeScreenFlow.flatMapLatest { homeScreenState ->
-            val priorityFilterToUse = if (homeScreenState.priorityFilter.isEmpty()) {
+            val priorityFilterToUse = homeScreenState.priorityFilter.ifEmpty {
                 mutableSetOf<Int>().apply { // Apply all filter if filter set is empty
                     Priority.entries.forEach { option ->
                         add(option.ordinal + 1)
                     }
                 }
-            } else {
-                homeScreenState.priorityFilter
             }
 
-            val isDoneFilterToUse = if (homeScreenState.isDoneFilter.isEmpty()) {
+            val isDoneFilterToUse = homeScreenState.isDoneFilter.ifEmpty {
                 setOf(true, false)
-            } else {
-                homeScreenState.isDoneFilter
             }
 
             when (homeScreenState.sortedBy) {
